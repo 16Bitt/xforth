@@ -1,5 +1,6 @@
 #include "forth.h"
 #include "stdio.h"
+#include "stdlib.h"
 
 unsigned int pop(){
 	ASSERT(SP > 0)
@@ -9,6 +10,16 @@ unsigned int pop(){
 void push(unsigned int value){
 	ASSERT(SP + 1 < STACK_SIZE)
 	STACK[SP++] = value;
+}
+
+unsigned int p_pop(){
+	ASSERT(P_SP > 0)
+	return P_STACK[--P_SP];
+}
+
+void p_push(unsigned int value){
+	ASSERT(P_SP + 1 < P_STACK_SIZE)
+	P_STACK[P_SP++] = value;
 }
 
 //g c exit ret
@@ -69,4 +80,21 @@ void divide(){
 	ASSERT(a != 0)
 
 	push(b / a);
+}
+
+//g r , comma
+void comma(){
+	int value = pop();
+	*((unsigned int*) HERE) = value;
+	HERE += 4;
+}
+
+//g r line get_forth_line
+void get_forth_line(){
+	char input_buffer[512];
+	memset((void*) input_buffer, 0, 512);
+	gets(input_buffer);
+	memcpy((void*) HERE, (void*) input_buffer, 512);
+	push(HERE);
+	HERE += 512;
 }

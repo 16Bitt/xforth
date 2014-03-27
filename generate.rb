@@ -78,7 +78,7 @@ c_words.each do |combo|
 	file.puts "*((unsigned int*) write_location) = (unsigned int) &ret; write_location += 4;"
 end
 
-file.puts "C_LAST = temp_last;}"
+file.puts "C_LAST = temp_last; HERE = write_location;}"
 file.close
 
 puts "Success."
