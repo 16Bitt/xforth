@@ -1,4 +1,4 @@
-SOURCES = main.o globals.o error.o
+SOURCES = main.o globals.o vm.o error.o native.o hardcode.o loader.o
 CFLAGS 	= -m32 -Iheader/
 
 all: $(SOURCES)

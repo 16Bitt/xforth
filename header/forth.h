@@ -17,9 +17,9 @@ typedef struct{
 			last,			//last runtime word
 			c_last;			//last compile time word
 
-	unsigned int*	stack,			//data stack address
-			r_stack,		//return stack address
-			p_stack;		//parallell stack address
+	unsigned int*	stack;			//data stack address
+	unsigned int*	r_stack;		//return stack address
+	unsigned int*	p_stack;		//parallell stack address
 
 	void*		heap;			//heap address
 } forth_env_t;
@@ -37,6 +37,9 @@ extern int line;
 #define R_STACK_SIZE	current->r_stack_size
 #define P_STACK_SIZE	current->p_stack_size
 #define HEAP_SIZE	current->heap_size
+
+#define R_LAST		current->last
+#define C_LAST		current->c_last
 
 #define STACK		current->stack
 #define R_STACK		current->r_stack
