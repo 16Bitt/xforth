@@ -98,3 +98,14 @@ void get_forth_line(){
 	push(HERE);
 	HERE += 512;
 }
+
+//g r c-len forth_strlen
+void forth_strlen(){
+	char* start = (char*) pop();
+	
+	int count = 0;
+	while(start[count] != 0)
+		count++;
+	
+	push((unsigned int) count);
+}
