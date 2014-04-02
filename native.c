@@ -2,6 +2,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#define var unsigned int
+
 unsigned int pop(){
 	ASSERT(SP > 0)
 	return STACK[--SP];
@@ -87,6 +89,56 @@ void comma(){
 	int value = pop();
 	*((unsigned int*) HERE) = value;
 	HERE += 4;
+}
+
+//g r = f_eq
+void f_eq(){
+	if(pop() == pop())
+		push(1);
+	else
+		push(0);
+}
+
+//g r < f_lt
+void f_lt(){
+	var a = pop();
+	var b = pop();
+	
+	if(b < a)
+		push(1);
+	else
+		push(0);
+}
+
+//g r > f_gt
+void f_gt(){
+	var a = pop();
+	var b = pop();
+
+	if(b > a)
+		push(1);
+	else
+		push(0);
+}
+
+//g r not f_not
+void f_not(){
+	push(!pop());
+}
+
+//g r and f_and
+void f_and(){
+	push(pop() & pop());
+}
+
+//g r or f_or
+void f_or(){
+	push(pop() | pop());
+}
+
+//g r xor f_xor
+void f_xor(){
+	push(pop() ^ pop());
 }
 
 //g r line get_forth_line
