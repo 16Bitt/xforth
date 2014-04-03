@@ -41,6 +41,17 @@ void call(){
 	PC = address;
 }
 
+//g c jump jump
+void jump(){
+	PC = *((unsigned int*) PC + 4) - 4;
+}
+
+//g c zjump zjump
+void zjump(){
+	if(pop())
+		PC = *((unsigned int*) PC + 4) - 4;
+}
+
 //g r emit emit
 void emit(){
 	printf("%c", (char) pop());
@@ -155,9 +166,21 @@ void get_forth_line(){
 void forth_strlen(){
 	char* start = (char*) pop();
 	
-	int count = 0;
-	while(start[count] != 0)
-		count++;
-	
+	int count = strlen(start);
 	push((unsigned int) count);
+}
+
+//g r list list
+void list(){
+	unsigned int current_word = R_LAST;
+	
+	while(current != 0){
+		printf("%s ", ((char*) current_word + 4));
+		current_word = *((unsigned int*) current_word);
+	}
+}
+
+//g r leave leave
+void leave(){
+	exit((int) pop());
 }

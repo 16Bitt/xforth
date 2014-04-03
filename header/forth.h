@@ -13,9 +13,10 @@ typedef struct{
 			stack_size,		//size of data stack
 			r_stack_size,		//size of return stack
 			p_stack_size,		//size of parallell stack
-			heap_size,		//size of heap
-			last,			//last runtime word
-			c_last;			//last compile time word
+			heap_size;		//size of heap
+	
+	unsigned int	last;			//last runtime word
+	unsigned int	c_last;			//last compile time word
 
 	unsigned int*	stack;			//data stack address
 	unsigned int*	r_stack;		//return stack address
