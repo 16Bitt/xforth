@@ -10,3 +10,6 @@ hardcode.c:
 
 clean:
 	-rm *.o hardcode.c build/cforth
+
+run: all
+	./build/cforth

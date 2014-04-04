@@ -24,7 +24,7 @@ void p_push(unsigned int value){
 	P_STACK[P_SP++] = value;
 }
 
-//g c exit ret
+//g c ret ret
 void ret(){
 	ASSERT(R_SP > 0)
 	PC = R_STACK[ --R_SP ];
@@ -41,6 +41,12 @@ void call(){
 	PC = address;
 }
 
+//g c lit lit
+void lit(){
+	push(*((unsigned int*) PC + 4));
+	PC += 4;
+}
+
 //g c jump jump
 void jump(){
 	PC = *((unsigned int*) PC + 4) - 4;
@@ -50,6 +56,32 @@ void jump(){
 void zjump(){
 	if(pop())
 		PC = *((unsigned int*) PC + 4) - 4;
+}
+
+//g r @ at
+void at(){
+	push(*((unsigned int*) pop()));
+}
+
+//g r c@ c_at
+void c_at(){
+	push((unsigned int) *((char*) pop()));
+}
+
+//g r ! set
+void set(){
+	unsigned int dest = pop();
+	unsigned int data = pop();
+
+	*((unsigned int*) dest) = data;
+}
+
+//g r c! c_set
+void c_set(){
+	unsigned int dest = pop();
+	unsigned int data = pop();
+
+	*((char*) dest) = (char) data;
 }
 
 //g r emit emit

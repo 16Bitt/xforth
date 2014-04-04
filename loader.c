@@ -1,10 +1,11 @@
 #include "forth.h"
 #include "stdlib.h"
-//This is for loading an empty forth job
+#include "string.h"
 
 extern void hard_load();
 
-forth_env_t* load(unsigned int heap_size, unsigned int stack_size){
+//create empty forth job
+forth_env_t* load_new(unsigned int heap_size, unsigned int stack_size){
 	forth_env_t* save = current;
 	current = (forth_env_t*) malloc(sizeof(forth_env_t));
 	
@@ -26,4 +27,20 @@ forth_env_t* load(unsigned int heap_size, unsigned int stack_size){
 	current = save;
 
 	return ret;
+}
+
+void forth_start(char* word){
+	unsigned int current_word = R_LAST;
+
+	while(current_word != 0){
+		if(!strcmp(word, (char*) current_word + 4)){
+			PC = strlen((char*) current_word + 4) + 1;
+			return;
+		}
+
+		current_word = *((unsigned int*) current_word);
+	}
+
+	//If execution reaches this point, it's time to error out, as the word does not exist
+	ASSERT(1 == 0)
 }
