@@ -74,9 +74,11 @@ end
 
 puts "Generating simple definitions (run time)..."
 r_defs.each do |list|
-	name = list[0]
+	fname = list[0]
 	words = list[1...list.length]
 	
+	puts "Writing simple..."
+
 	file.puts "*((unsigned int*) write_location) = temp_last; temp_last = write_location; write_location += 4;"
 	for i in 0...fname.length
 		file.puts "*((char*) write_location) = '#{fname[i].chr}'; write_location++;"
@@ -112,7 +114,7 @@ end
 
 puts "Generating simple definitions (compile time)..."
 c_defs.each do |list|
-	name = list[0]
+	fname = list[0]
 	words = list[1...list.length]
 	
 	file.puts "*((unsigned int*) write_location) = temp_last; temp_last = write_location; write_location += 4;"

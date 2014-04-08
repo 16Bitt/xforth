@@ -32,6 +32,13 @@ void ret(){
 	PC = R_STACK[ --R_SP ];
 }
 
+//g r dump f_dump
+void f_dump(){
+	var i = 0;
+	while(i < SP)
+		printf("%X ", STACK[i++]);
+}
+
 //g c docol call
 void call(){
 	unsigned int address = *((unsigned int*)PC + 4);
@@ -65,9 +72,9 @@ void run_word(){
 	var address = pop();
 	ASSERT(address != 0)
 	ASSERT(R_SP + 1 < R_STACK_SIZE)
-
 	R_STACK[R_SP++] = PC;
-	PC = address;
+	
+	PC = address - 4;
 }
 
 //g r @ at
@@ -123,7 +130,7 @@ void emit(){
 
 //g r . dot
 void dot(){
-	printf("%d", pop());
+	printf("%X", pop());
 }
 
 //g r ok ok
@@ -238,14 +245,21 @@ void forth_strlen(){
 void list(){
 	unsigned int current_word = R_LAST;
 	
-	while(current != 0){
+	while(current_word != 0){
 		printf("%s ", ((char*) current_word + 4));
 		current_word = *((unsigned int*) current_word);
 	}
 }
 
+//g r leave-clean leave_clean
+void leave_clean(){
+	puts("");
+	exit(0);
+}
+
 //g r leave leave
 void leave(){
+	puts("");
 	exit((int) pop());
 }
 
@@ -290,8 +304,9 @@ void find(){
 
 //g r cfa cfa
 void cfa(){
-	char* name = (char*) (pop() + 4);
-	push(strlen(name) + 1);
+	var address = pop();
+	char* name = (char*) (address + 4);
+	push(address + 4 + strlen(name) + 1);
 }
 
 //g r 0buffer zero_buffer
@@ -307,8 +322,6 @@ void zero_buffer(){
 			buffer[i] = 0;
 	}
 }
-
-#define threshold 4
 
 //g r eval eval
 void eval(){
@@ -336,15 +349,27 @@ void eval(){
 		}
 
 		cfa();					//code* --
-		run_word();
+		run_word();				//output --
 
 		i += word_length;
 	}
 }
 
-//g r repl repl
+//g r push512 push512
+void push512(){
+	push(512);
+}
+
+//r r repl get_forth_line dup push512 swap zero_buffer push512 swap eval ok leave_clean
+
+/*
 void repl(){
 	for(;;){
+		ASSERT(R_SP + 1 < R_STACK_SIZE)
+		R_STACK[R_SP++] = PC;
+		
+		printf("%X", R_SP);
+
 		get_forth_line();	//buffer
 		dup();			//buffer -- buffer
 		push(512);		//buffer -- buffer -- 512
@@ -353,6 +378,8 @@ void repl(){
 		push(512);		//buffer -- 512
 		swap();			//512 -- buffer
 		eval();			//--
+		return;
 		ok();
 	}
 }
+*/
