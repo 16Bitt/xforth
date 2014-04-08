@@ -4,6 +4,8 @@
 
 #define var unsigned int
 
+unsigned int state = 0;
+
 unsigned int pop(){
 	ASSERT(SP > 0)
 	return STACK[--SP];
@@ -58,6 +60,16 @@ void zjump(){
 		PC = *((unsigned int*) PC + 4) - 4;
 }
 
+//g r exec run_word
+void run_word(){
+	var address = pop();
+	ASSERT(address != 0)
+	ASSERT(R_SP + 1 < R_STACK_SIZE)
+
+	R_STACK[R_SP++] = PC;
+	PC = address;
+}
+
 //g r @ at
 void at(){
 	push(*((unsigned int*) pop()));
@@ -82,6 +94,26 @@ void c_set(){
 	unsigned int data = pop();
 
 	*((char*) dest) = (char) data;
+}
+
+//g r swap swap
+void swap(){
+	var a = pop();
+	var b = pop();
+	push(a);
+	push(b);
+}
+
+//g r dup dup
+void dup(){
+	var a = pop();
+	push(a);
+	push(a);
+}
+
+//g r drop drop
+void drop(){
+	pop();
 }
 
 //g r emit emit
@@ -215,4 +247,112 @@ void list(){
 //g r leave leave
 void leave(){
 	exit((int) pop());
+}
+
+//g r state get_state
+void get_state(){
+	push((unsigned int) &state);
+}
+
+//g r find find
+void find(){
+	unsigned int current_word;
+	char* name = (char*) pop();
+
+	if(state){
+		current_word = C_LAST;
+		while(current_word != 0){
+			char* word_name = (char*) (current_word + 4);
+			
+			if(!strcmp(name, word_name)){
+				push(current_word);
+				return;
+			}
+
+			current_word = *((unsigned int*) current_word);
+		}
+	}
+	
+	current_word = R_LAST;
+	while(current_word != 0){
+		char* word_name = (char*) (current_word + 4);
+
+		if(!strcmp(word_name, name)){
+			push(current_word);
+			return;
+		}
+
+		current_word = *((unsigned int*) current_word);
+	}
+
+	push(0);
+}
+
+//g r cfa cfa
+void cfa(){
+	char* name = (char*) (pop() + 4);
+	push(strlen(name) + 1);
+}
+
+//g r 0buffer zero_buffer
+void zero_buffer(){
+	char* buffer = (char*) pop();
+	unsigned int size = pop();
+
+	unsigned int i;
+	for(i = 0; i < size; i++){
+		if(buffer[i] == ' ')
+			buffer[i] = 0;
+		else if(buffer[i] == '\n')
+			buffer[i] = 0;
+	}
+}
+
+#define threshold 4
+
+//g r eval eval
+void eval(){
+	char* words = (char*) pop();
+	unsigned int buffer_length = pop();
+
+	var i = 0;
+	while(i < buffer_length){
+		if(words[i] == 0){
+			i++;
+			continue;
+		}
+
+		var name = ((var) words) + i;
+		var word_length = strlen((char*) name);
+		
+		push(name);				//name --
+		find();					//addr --
+		dup();					//addr -- addr --
+
+		if(!pop()){				//? addr --
+			puts(" WORD NOT FOUND.");
+			drop();				//? --
+			return;
+		}
+
+		cfa();					//code* --
+		run_word();
+
+		i += word_length;
+	}
+}
+
+//g r repl repl
+void repl(){
+	for(;;){
+		get_forth_line();	//buffer
+		dup();			//buffer -- buffer
+		push(512);		//buffer -- buffer -- 512
+		swap();			//buffer -- 512 -- buffer
+		zero_buffer();		//buffer
+		push(512);		//buffer -- 512
+		swap();			//512 -- buffer
+		eval();			//--
+		ok();
+	}
 }

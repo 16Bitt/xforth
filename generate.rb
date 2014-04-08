@@ -67,7 +67,7 @@ r_words.each do |combo|
 	for i in 0...fname.length
 		file.puts "*((char*) write_location) = '#{fname[i].chr}'; write_location++;"
 	end
-
+	file.puts "*((char*) write_location) = (char) 0; write_location++;"
 	file.puts "*((unsigned int*) write_location) = (unsigned int) &#{arr[1]}; write_location += 4;"
 	file.puts "*((unsigned int*) write_location) = (unsigned int) &ret; write_location += 4;"
 end
@@ -82,6 +82,8 @@ r_defs.each do |list|
 		file.puts "*((char*) write_location) = '#{fname[i].chr}'; write_location++;"
 	end
 
+	file.puts "*((char*) write_location) = (char) 0; write_location++;"
+	
 	words.each do |word|
 		file.puts "*((unsigned int*) write_location) = (unsigned int) &#{word}; write_location += 4;"
 	end
@@ -103,6 +105,7 @@ c_words.each do |combo|
 		file.puts "*((char*) write_location) = '#{fname[i].chr}'; write_location++;"
 	end
 
+	file.puts "*((char*) write_location) = (char) 0; write_location++;"
 	file.puts "*((unsigned int*) write_location) = (unsigned int) &#{arr[1]}; write_location += 4;"
 	file.puts "*((unsigned int*) write_location) = (unsigned int) &ret; write_location += 4;"
 end
@@ -117,6 +120,8 @@ c_defs.each do |list|
 		file.puts "*((char*) write_location) = '#{fname[i].chr}'; write_location++;"
 	end
 
+	file.puts "*((char*) write_location) = (char) 0; write_location++;"
+	
 	words.each do |word|
 		file.puts "*((unsigned int*) write_location) = (unsigned int) &#{word}; write_location += 4;"
 	end
