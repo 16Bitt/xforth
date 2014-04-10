@@ -4,6 +4,8 @@
 
 #define var unsigned int
 
+extern yield_execution(unsigned int);
+
 unsigned int state = 0;
 
 unsigned int pop(){
@@ -70,11 +72,7 @@ void zjump(){
 //g r exec run_word
 void run_word(){
 	var address = pop();
-	ASSERT(address != 0)
-	ASSERT(R_SP + 1 < R_STACK_SIZE)
-	R_STACK[R_SP++] = PC;
-	
-	PC = address - 4;
+	yield_execution(address);
 }
 
 //g r @ at
@@ -133,9 +131,15 @@ void dot(){
 	printf("%X", pop());
 }
 
+//g r .s dot_s
+void dot_s(){
+	char* str = (char*) pop();
+	puts(str);
+}
+
 //g r ok ok
 void ok(){
-	printf(" OK. ");
+	puts(" OK.");
 }
 
 //g r + plus
@@ -253,13 +257,11 @@ void list(){
 
 //g r leave-clean leave_clean
 void leave_clean(){
-	puts("");
 	exit(0);
 }
 
 //g r leave leave
 void leave(){
-	puts("");
 	exit((int) pop());
 }
 
@@ -323,63 +325,156 @@ void zero_buffer(){
 	}
 }
 
-//g r eval eval
-void eval(){
-	char* words = (char*) pop();
-	unsigned int buffer_length = pop();
+var char_pos;
+var ibuffer_length;
+char* ibuffer;
 
-	var i = 0;
-	while(i < buffer_length){
-		if(words[i] == 0){
-			i++;
+//g r word word
+void word(){
+	while(char_pos < ibuffer_length){
+		if(ibuffer[char_pos] == 0){
+			char_pos++;
 			continue;
 		}
-
-		var name = ((var) words) + i;
-		var word_length = strlen((char*) name);
 		
-		push(name);				//name --
-		find();					//addr --
-		dup();					//addr -- addr --
+		push(((var) ibuffer) + char_pos);
+		char_pos += strlen((char*) (((var) ibuffer) + char_pos));
+		return;
+	}
 
-		if(!pop()){				//? addr --
-			puts(" WORD NOT FOUND.");
-			drop();				//? --
+	push(0);
+}
+
+//g r number? is_number
+void is_number(){
+	char* str = (char*) pop();
+	
+	int i;
+	for(i = 0; i < strlen(str); i++){
+		if((str[i] < '0') || (str[i] > '9')){
+			push(0);
 			return;
 		}
+	}
 
-		cfa();					//code* --
-		run_word();				//output --
+	push(1);
+}
 
-		i += word_length;
+//g r number number
+void number(){
+	char* str = (char*) pop();
+	var num = atoi(str);
+	push(num);
+}
+
+//g r eval eval
+void eval(){
+	ibuffer = pop();
+	ibuffer_length = pop();
+	char_pos = 0;
+
+	for(;;){
+		if(!state){
+			word();						//word* --
+			dup();						//word* -- word* --
+	
+			if(!pop()){					//word* --
+				drop();					//--
+				return;
+			}
+			
+			dup();						//word* -- word* --
+			is_number();					//word* -- flag
+	
+			if(!pop()){
+				find();					//addr --
+				dup();					//addr -- addr --
+			
+				if(!pop()){				//addr --
+					puts("WORD NOT FOUND");
+					drop();				//--
+					return;
+				}
+	
+				cfa();					//code* --
+				run_word();				//output -- ... --
+			}
+			
+			else{
+				number();				//num --
+			}
+		}
+
+		else{
+			word();						//word* --
+			dup();						//word* -- word* --
+
+			if(!pop()){					//word* --
+				drop();					//--
+				return;
+			}
+
+			dup();						//word* -- word* --
+			dup(); 						//word* -- word* -- word* --
+			
+			char* temp = (char*) pop();			//word* -- word* --
+			if(!strcmp(temp, "]")){
+				drop();					//word* --
+				drop();					//--
+				state = 0;
+				continue;
+			}
+
+			is_number();					//word* -- flag --
+			if(!pop()){					//word* --
+				find();					//addr --
+	
+				dup();					//addr -- addr --
+				if(!pop()){				//addr --
+					puts("S=1 WORD NOT FOUND");
+					drop();				//--
+					return;
+				}
+
+				cfa();					//code* --
+				push((var) &call);			//code* -- &docol --
+				comma();				//code* --
+				comma();				// --
+			}
+
+			else{
+				push((var) &lit);			//word* -- &lit --
+				comma();				//word* --
+				number();				//num --
+				comma();				//--
+			}
+		}
 	}
 }
 
-//g r push512 push512
-void push512(){
-	push(512);
+//g r [ o_bracket
+void o_bracket(){
+	state = 1;
 }
 
-//r r repl get_forth_line dup push512 swap zero_buffer push512 swap eval ok leave_clean
+//g r ] c_bracket
+void c_bracket(){
+	state = 0;
+}
 
-/*
+//g r repl repl
 void repl(){
+	ok();
+	
 	for(;;){
-		ASSERT(R_SP + 1 < R_STACK_SIZE)
-		R_STACK[R_SP++] = PC;
-		
-		printf("%X", R_SP);
-
-		get_forth_line();	//buffer
-		dup();			//buffer -- buffer
-		push(512);		//buffer -- buffer -- 512
-		swap();			//buffer -- 512 -- buffer
-		zero_buffer();		//buffer
-		push(512);		//buffer -- 512
-		swap();			//512 -- buffer
-		eval();			//--
-		return;
+		get_forth_line();
+		dup();
+		push(512);
+		swap();
+		zero_buffer();
+		push(512);
+		swap();
+		eval();
 		ok();
 	}
 }
-*/

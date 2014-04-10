@@ -13,3 +13,6 @@ clean:
 
 run: all
 	./build/cforth
+
+install:
+	cp build/cforth /bin/
