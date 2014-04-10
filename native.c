@@ -275,6 +275,26 @@ void find(){
 	unsigned int current_word;
 	char* name = (char*) pop();
 
+	current_word = R_LAST;
+	while(current_word != 0){
+		char* word_name = (char*) (current_word + 4);
+
+		if(!strcmp(word_name, name)){
+			push(current_word);
+			return;
+		}
+
+		current_word = *((unsigned int*) current_word);
+	}
+
+	push(0);
+}
+
+//g r cfind cfind
+void cfind(){
+	unsigned int current_word;
+	char* name = (char*) pop();
+
 	if(state){
 		current_word = C_LAST;
 		while(current_word != 0){
@@ -289,18 +309,6 @@ void find(){
 		}
 	}
 	
-	current_word = R_LAST;
-	while(current_word != 0){
-		char* word_name = (char*) (current_word + 4);
-
-		if(!strcmp(word_name, name)){
-			push(current_word);
-			return;
-		}
-
-		current_word = *((unsigned int*) current_word);
-	}
-
 	push(0);
 }
 
@@ -427,13 +435,25 @@ void eval(){
 
 			is_number();					//word* -- flag --
 			if(!pop()){					//word* --
-				find();					//addr --
-	
-				dup();					//addr -- addr --
-				if(!pop()){				//addr --
-					puts("S=1 WORD NOT FOUND");
-					drop();				//--
-					return;
+				dup();					//word* --
+				find();					//word* -- addr --
+		
+				dup();					//word* -- addr -- addr --
+				if(!pop()){				//word* -- addr --
+					drop(); 			//word* --
+					cfind();			//addr --
+					if(!pop()){
+						puts("S=1 WORD NOT FOUND");
+						drop();
+						return;
+					}
+					cfa();
+					run_word();
+					continue;
+				}
+				
+				else{
+					drop();
 				}
 
 				cfa();					//code* --
@@ -450,6 +470,30 @@ void eval(){
 			}
 		}
 	}
+}
+
+//g r strhere strhere
+void strhere(){
+	char* dest = (char*) HERE;
+	char* src = (char*) pop();
+
+	int i;
+	for(i = 0; i < strlen(src); i++){
+		dest[i] = src[i];
+	}
+
+	dest[i + 1] = 0;
+	HERE += strlen(src) + 1;
+}
+
+//g r last get_last
+void get_last(){
+	push(R_LAST);
+}
+
+//g r last! set_last
+void set_last(){
+	R_LAST = pop();
 }
 
 //g r [ o_bracket
