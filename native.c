@@ -43,13 +43,13 @@ void f_dump(){
 
 //g c docol call
 void call(){
-	unsigned int address = *((unsigned int*)PC + 4);
+	unsigned int address = ((var*) PC)[1];
 	ASSERT(address != 0)
 	PC += 4;
-	
+
 	ASSERT(R_SP + 1 < R_STACK_SIZE)
 	R_STACK[R_SP++] = PC;
-	PC = address;
+	PC = address - 4;
 }
 
 //g r status status
@@ -61,7 +61,7 @@ void status(){
 
 //g c lit lit
 void lit(){
-	push(*((var*) PC + 4));
+	push(((var*)PC)[1]);
 	PC += 4;
 }
 
@@ -180,7 +180,6 @@ void divide(){
 //g r , comma
 void comma(){
 	int value = pop();
-	printf("WRITING VALUE: %X\n", value);
 	*((unsigned int*) HERE) = value;
 	HERE += 4;
 }
@@ -365,8 +364,6 @@ void word(){
 void is_number(){
 	char* str = (char*) pop();
 	
-	printf("IS_NUMBER? %s\n", str);
-
 	int i;
 	for(i = 0; i < strlen(str); i++){
 		if((str[i] < '0') || (str[i] > '9')){
