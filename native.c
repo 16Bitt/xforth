@@ -28,7 +28,7 @@ void p_push(unsigned int value){
 	P_STACK[P_SP++] = value;
 }
 
-//g c ret ret
+//g r ret ret
 void ret(){
 	ASSERT(R_SP > 0)
 	PC = R_STACK[ --R_SP ];
@@ -52,9 +52,16 @@ void call(){
 	PC = address;
 }
 
+//g r status status
+void status(){
+	var start = (var) HEAP;
+	var size = ((var) HERE) - start;
+	printf("%i/%i bytes.", size, HEAP_SIZE);
+}
+
 //g c lit lit
 void lit(){
-	push(*((unsigned int*) PC + 4));
+	push(*((var*) PC + 4));
 	PC += 4;
 }
 
@@ -173,6 +180,7 @@ void divide(){
 //g r , comma
 void comma(){
 	int value = pop();
+	printf("WRITING VALUE: %X\n", value);
 	*((unsigned int*) HERE) = value;
 	HERE += 4;
 }
@@ -229,12 +237,12 @@ void f_xor(){
 
 //g r line get_forth_line
 void get_forth_line(){
-	char input_buffer[512];
-	memset((void*) input_buffer, 0, 512);
+	char input_buffer[128];
+	memset((void*) input_buffer, 0, 128);
 	gets(input_buffer);
-	memcpy((void*) HERE, (void*) input_buffer, 512);
+	memcpy((void*) HERE, (void*) input_buffer, 128);
 	push(HERE);
-	HERE += 512;
+	HERE += 128;
 }
 
 //g r c-len forth_strlen
@@ -357,6 +365,8 @@ void word(){
 void is_number(){
 	char* str = (char*) pop();
 	
+	printf("IS_NUMBER? %s\n", str);
+
 	int i;
 	for(i = 0; i < strlen(str); i++){
 		if((str[i] < '0') || (str[i] > '9')){
@@ -414,60 +424,50 @@ void eval(){
 		}
 
 		else{
-			word();						//word* --
-			dup();						//word* -- word* --
+			word();			//word* --
+			dup();			//word* -- word* --
 
-			if(!pop()){					//word* --
-				drop();					//--
+			if(!pop()){		//word* --
+				drop();			//--
 				return;
 			}
 
-			dup();						//word* -- word* --
-			dup(); 						//word* -- word* -- word* --
+			dup();			//word* -- word* --
+			is_number();		//word* -- flag --
+
+			if(pop()){		//word* --
+				push((var) &lit);	//word* -- lit* --
+				comma();		//word* --
+				number();		//num --
+				comma();		//--
+				continue;
+			}
 			
-			char* temp = (char*) pop();			//word* -- word* --
-			if(!strcmp(temp, "]")){
-				drop();					//word* --
-				drop();					//--
-				state = 0;
+			dup();			//word* -- word* --
+			cfind();		//word* -- addr --
+			
+			if(pop()){		//word* --
+				cfind();		//addr --
+				cfa();			//code* --
+				run_word();		//output --
 				continue;
 			}
 
-			is_number();					//word* -- flag --
-			if(!pop()){					//word* --
-				dup();					//word* --
-				find();					//word* -- addr --
-		
-				dup();					//word* -- addr -- addr --
-				if(!pop()){				//word* -- addr --
-					drop(); 			//word* --
-					cfind();			//addr --
-					if(!pop()){
-						puts("S=1 WORD NOT FOUND");
-						drop();
-						return;
-					}
-					cfa();
-					run_word();
-					continue;
-				}
-				
-				else{
-					drop();
-				}
+			dup();			//word* -- word* --
+			find();			//word* -- addr --
 
-				cfa();					//code* --
-				push((var) &call);			//code* -- &docol --
-				comma();				//code* --
-				comma();				// --
+			if(pop()){		//word* --
+				push((var) &call);	//word* -- call* --
+				comma();		//word* --
+				find();			//addr --
+				cfa();
+				comma();
+				continue;
 			}
 
-			else{
-				push((var) &lit);			//word* -- &lit --
-				comma();				//word* --
-				number();				//num --
-				comma();				//--
-			}
+			drop();			//--
+			puts("S=1 WORD NOT FOUND");
+			return;
 		}
 	}
 }
@@ -482,8 +482,35 @@ void strhere(){
 		dest[i] = src[i];
 	}
 
-	dest[i + 1] = 0;
+	dest[strlen(src) + 1] = 0;
 	HERE += strlen(src) + 1;
+}
+
+//g r create r_create
+void r_create(){
+	word();			//word* --
+	dup();			//word* -- word* --
+	
+	if(!pop()){
+		drop();		//--
+		puts("ERR: END OF INPUT");
+		return;
+	}
+
+	var temp_here = HERE;
+	get_last();		//word* -- last --
+	comma();		//word* --
+	R_LAST = temp_here;
+	strhere();		//--
+}
+
+//r r : r_create o_bracket
+
+//g c ; semicolon
+void semicolon(){
+	push((var) &ret);
+	comma();
+	state = 0;
 }
 
 //g r last get_last
@@ -491,9 +518,19 @@ void get_last(){
 	push(R_LAST);
 }
 
+//g r c-last get_c_last
+void get_c_last(){
+	push(C_LAST);
+}
+
 //g r last! set_last
 void set_last(){
 	R_LAST = pop();
+}
+
+//g r c-last! set_c_last
+void set_c_last(){
+	C_LAST = pop();
 }
 
 //g r [ o_bracket
@@ -501,7 +538,7 @@ void o_bracket(){
 	state = 1;
 }
 
-//g r ] c_bracket
+//g c ] c_bracket
 void c_bracket(){
 	state = 0;
 }
@@ -513,10 +550,10 @@ void repl(){
 	for(;;){
 		get_forth_line();
 		dup();
-		push(512);
+		push(128);
 		swap();
 		zero_buffer();
-		push(512);
+		push(128);
 		swap();
 		eval();
 		ok();
