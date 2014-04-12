@@ -67,7 +67,7 @@ void lit(){
 
 //g c jump jump
 void jump(){
-	PC = *((unsigned int*) PC + 4) - 4;
+	PC = ((var*) PC)[1] - 4;
 }
 
 //g c zjump zjump
@@ -236,12 +236,10 @@ void f_xor(){
 
 //g r line get_forth_line
 void get_forth_line(){
-	char input_buffer[128];
+	char* input_buffer = (char*) malloc(128);
 	memset((void*) input_buffer, 0, 128);
 	gets(input_buffer);
-	memcpy((void*) HERE, (void*) input_buffer, 128);
-	push(HERE);
-	HERE += 128;
+	push((var) input_buffer);
 }
 
 //g r c-len forth_strlen
@@ -467,6 +465,8 @@ void eval(){
 			return;
 		}
 	}
+
+	free(ibuffer);
 }
 
 //g r strhere strhere
@@ -538,6 +538,80 @@ void o_bracket(){
 //g c ] c_bracket
 void c_bracket(){
 	state = 0;
+}
+
+//g r " quote
+void quote(){
+	word();
+	
+	while((ibuffer[char_pos] != '"') && (char_pos < ibuffer_length)){
+		if(ibuffer[char_pos] == 0)
+			ibuffer[char_pos] = ' ';
+		char_pos++;
+	}
+	
+	if(char_pos < ibuffer_length)
+		ibuffer[char_pos] = 0;		//zero terminate the string at the "
+
+	char_pos++;
+}
+
+//r r ." quote dot_s
+
+//g c " c_quote
+void c_quote(){
+	
+	push((var) &jump);
+	comma();
+	var save = HERE;
+	push(0);
+	comma();
+
+	word();
+	var start_string = pop();
+
+	while((ibuffer[char_pos] != '"') && (char_pos < ibuffer_length)){
+		if(ibuffer[char_pos] == 0)
+			ibuffer[char_pos] = ' ';
+		char_pos++;
+	}
+	
+	if(char_pos < ibuffer_length)
+		ibuffer[char_pos] = 0;		//zero terminate the string at the "
+
+	char_pos++;
+
+	push(start_string);
+	strhere();
+	*((unsigned int*) save) = HERE;
+	
+	push((var) &lit);
+	comma();
+	push(start_string);
+	comma();
+}
+
+//g c ." dot_quote
+void dot_quote(){
+	c_quote();
+	push((var) &dot_s);
+	comma();
+}
+
+//g r ( paren
+void paren(){
+	while((ibuffer[char_pos] != ')') && (char_pos < ibuffer_length))
+		char_pos++;
+
+	char_pos++;
+}
+
+//g c ( c_paren
+void c_paren(){
+	while((ibuffer[char_pos] != ')') && (char_pos < ibuffer_length))
+		char_pos++;
+
+	char_pos++;
 }
 
 //g r repl repl
