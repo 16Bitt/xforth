@@ -14,5 +14,5 @@ clean:
 run: all
 	./build/cforth
 
-install:
+install: all
 	cp build/cforth /bin/
