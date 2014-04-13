@@ -1,4 +1,4 @@
-SOURCES = main.o globals.o vm.o error.o native.o hardcode.o loader.o
+SOURCES = main.o globals.o vm.o error.o native.o hardcode.o loader.o cli.o
 CFLAGS 	= -m32 -Iheader/ -w
 LDFLAGS	= -w
 
@@ -12,7 +12,7 @@ clean:
 	-rm *.o hardcode.c build/cforth
 
 run: all
-	./build/cforth
+	./build/cforth off on 512 4096 repl
 
 install: all
 	cp build/cforth /bin/

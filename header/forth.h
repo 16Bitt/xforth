@@ -28,6 +28,14 @@ typedef struct{
 extern forth_env_t* current;
 extern int line;
 
+extern int flag_debug;
+extern int flag_echo;
+extern unsigned int init_stack_size;
+extern unsigned int init_heap_size;
+extern char* entry_point;
+
+void set_arguments(char** argv, int argc);
+
 #define PC 		current->pc
 #define SP 		current->sp
 #define R_SP 		current->r_sp
@@ -48,6 +56,7 @@ extern int line;
 
 #define HEAP		current->heap
 
+void dputs(char*);
 void fail(int line, char* filename);
 #define ASSERT(a) (a) ? : fail(__LINE__, __FILE__);
 

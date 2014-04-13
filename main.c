@@ -6,13 +6,9 @@ extern forth_env_t* load_new(unsigned int, unsigned int);
 extern void forth_start(char*);
 extern int run(forth_env_t*);
 
-int main(){
-	puts("Starting C_FORTH:");
-	forth_env_t* program = load_new(4096, 512);
-	puts("Loaded new program...");
-	current = program;
-	forth_start("repl");
-	puts("Set entry point to the repl...");
-	current = program;
+int main(int argc, char** argv){
+	set_arguments(argv, argc);
+	current = load_new(init_heap_size, init_stack_size);
+	forth_start(entry_point);
 	return run(current);
 }

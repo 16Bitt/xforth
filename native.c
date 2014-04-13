@@ -56,7 +56,7 @@ void call(){
 void status(){
 	var start = (var) HEAP;
 	var size = ((var) HERE) - start;
-	printf("%i/%i bytes.", size, HEAP_SIZE);
+	printf("%i/%i bytes", size, HEAP_SIZE);
 }
 
 //g c lit lit
@@ -141,12 +141,13 @@ void dot(){
 //g r .s dot_s
 void dot_s(){
 	char* str = (char*) pop();
-	puts(str);
+	printf(str);
 }
 
 //g r ok ok
 void ok(){
-	puts(" OK.");
+	if(flag_echo)
+		puts(" OK.");
 }
 
 //g r + plus
@@ -262,11 +263,13 @@ void list(){
 
 //g r leave-clean leave_clean
 void leave_clean(){
+	free(current);
 	exit(0);
 }
 
 //g r leave leave
 void leave(){
+	free(current);
 	exit((int) pop());
 }
 
@@ -616,6 +619,7 @@ void c_paren(){
 
 //g r repl repl
 void repl(){
+	status();
 	ok();
 	
 	for(;;){
