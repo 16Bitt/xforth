@@ -16,3 +16,5 @@ run: all
 
 install: all
 	cp build/cforth /bin/
+	chmod a+x frontend/xforth
+	cp frontend/xforth /bin/

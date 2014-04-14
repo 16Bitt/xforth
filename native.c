@@ -72,8 +72,10 @@ void jump(){
 
 //g c zjump zjump
 void zjump(){
-	if(pop())
-		PC = *((unsigned int*) PC + 4) - 4;
+	if(!pop())
+		PC = ((var*) PC)[1] - 4;
+
+	PC += 4;
 }
 
 //g r exec run_word
@@ -135,7 +137,7 @@ void emit(){
 
 //g r . dot
 void dot(){
-	printf("%X", pop());
+	printf("%u", pop());
 }
 
 //g r .s dot_s
@@ -263,12 +265,14 @@ void list(){
 
 //g r leave-clean leave_clean
 void leave_clean(){
+	dputs("Freeing current buffer");
 	free(current);
 	exit(0);
 }
 
 //g r leave leave
 void leave(){
+	dputs("Freeing current buffer");
 	free(current);
 	exit((int) pop());
 }
@@ -280,6 +284,7 @@ void get_state(){
 
 //g r find find
 void find(){
+	dputs("Runtime lookup");
 	unsigned int current_word;
 	char* name = (char*) pop();
 
@@ -300,6 +305,7 @@ void find(){
 
 //g r cfind cfind
 void cfind(){
+	dputs("Compile time lookup");
 	unsigned int current_word;
 	char* name = (char*) pop();
 
@@ -322,6 +328,7 @@ void cfind(){
 
 //g r cfa cfa
 void cfa(){
+	dputs("cfa()");
 	var address = pop();
 	char* name = (char*) (address + 4);
 	push(address + 4 + strlen(name) + 1);
@@ -469,6 +476,7 @@ void eval(){
 		}
 	}
 
+	dputs("Freeing input buffer");
 	free(ibuffer);
 }
 
@@ -633,4 +641,48 @@ void repl(){
 		eval();
 		ok();
 	}
+}
+
+//g r allot allot
+void allot(){
+	HERE += pop();
+}
+
+//g r variable variable
+void variable(){
+	r_create();
+	push((var) &lit);
+	comma();
+	push(HERE + 8);
+	comma();
+	push((var) &ret);
+	comma();
+	push(4);
+	allot();
+}
+
+//g c if f_if
+void f_if(){
+	push((var) &zjump);
+	comma();
+	p_push(HERE);
+	push(0);
+	comma();
+}
+
+//g c then f_then
+void f_then(){
+	push(HERE);
+	push(p_pop());
+	set();
+}
+
+//g r p> s_to_p
+void s_to_p(){
+	p_push(pop());
+}
+
+//g r >p p_to_s
+void p_to_s(){
+	push(p_pop());
 }

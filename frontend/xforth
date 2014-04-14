@@ -61,3 +61,35 @@ class ArgParse
 		@target
 	end
 end
+
+args = ArgParse.new ["--stack-size", "--heap-size", "--custom-backend", "--debug", "--echo"]
+
+stackSize 	= args.getValue("--stack-size")
+heapSize 	= args.getValue("--heap-size")
+backend 	= args.getValue("--custom-backend")
+dbg 		= args.getValue("--debug")
+echoFlag 	= args.getValue("--echo")
+
+if not stackSize
+	stackSize = "512"
+end
+
+if not heapSize
+	heapSize = "4096"
+end
+
+if not backend
+	backend = "cforth"
+else
+	backend = "cforth-" + backend
+end
+
+if not dbg
+	dbg = "off"
+end
+
+if not echoFlag
+	echoFlag = "on"
+end
+
+exec "cforth #{dbg} #{echoFlag} #{stackSize} #{heapSize} #{args.target}"
