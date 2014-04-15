@@ -1,0 +1,43 @@
+Xforth extension syntax
+
+HOW IT WORKS
+Words are parsed from comments in C files
+
+FLAGS
+There are 2 flags:
+r:	runtime		only runs when state is 0
+c:	compile		only runs when state is 1
+
+TYPES
+r:	simply a list of C functions to execute in order
+g:	A native C function mapped to a forth word
+
+SYNTAX
+r definition 	//r FLAG WORDNAME WORDS ...
+g definition	//g FLAG WORDNAME C_FUNCTION_NAME
+	NEXT LINE (mandatory)	void C_FUNCTION_NAME(){
+
+INTERFACING THE SYSTEM
+To start, "#include "forth.h"
+Stacks:
+	pop()		pop off of data stack uint32
+	push(uint32)	push onto data stack
+	p_pop()		pop off of parallell stack
+	p_push(uint32)	push onto parallell stack
+
+Any words defined can be accessed by calling them like any other C function.
+
+For example:
+//g r swap-drop swap_drop
+void swap_drop(){
+	swap();					//This is a call to another native word
+	pop();					//Equivalent to drop()
+	dputs("Swap Drop was called");		//will only print if debug flag is set
+}
+
+COMPILING
+-Add yourfile.o and youroutput.o to SOURCES in the makefile
+-Add a new rule named youroutput.c to the makefile that contains
+	ruby generate.rb yourfile.c youroutput.c
+
+As long as your files are in the main directory, this should work. Obviously yourfile.c and .o should be the names of your c file, and youroutput.c and .o should be whatever name you want the hardcoded dictionary to be.

@@ -1,0 +1,68 @@
+This is a short description of the native words in this dialect of FORTH
+
+WORD		STATE		ACCESS		DESCRIPTION
+
+dump		runtime		any		show stack status
+ret		compile		none		return from subroutine
+docol		compile		none		call subroutine
+status		runtime		any		Display heap status
+lit		compile		none		push value
+jump		compile		none		jump to location in memory
+zjump		compile		none		jump on zero
+exec		runtime		any		call address on top of stack
+@		runtime		any		peek address
+c@		runtime		any		peek byte at address
+!		runtime		any		poke address (value dest --)
+c!		runtime		any		poke byte at address (value dest --)
+swap		runtime		any		swap the two items on the top of the stack
+dup		runtime		any		duplicate top of the stack
+drop		runtime		any		drop top of stack
+emit		runtime		any		emit ascii
+.		runtime		any		print integer
+.s		runtime		any		print string
+ok		runtime		any		echoes " OK " if the echo flag is set
++		runtime		any		(a b -- a+b)
+-		runtime		any		(a b -- a-b)
+*		runtime		any		(a b -- a*b)
+/		runtime		any		(a b -- a/b)
+,		runtime		any		write to heap and increment HERE
+=		runtime		any		(a b -- t|f)
+<		runtime		any		(a b -- t|f)
+>		runtime		any		(a b -- t|f)
+not		runtime		any		NOTs top of stack
+and		runtime		any		(a b -- a&b)
+or		runtime		any		(a b -- a|b)
+xor		runtime		any		(a b -- a^b)
+line		runtime		any		gets line from stdin, returns string pointer
+list		runtime		any		lists all (runtime) words
+leave-clean	runtime		any		exit with a return code of 0
+leave		runtime		any		exit with a return code equal to the top of stack
+state		runtime		any		returns address of state variable
+find		runtime		any		finds the word pointed to
+cfind		runtime		any		finds the word pointed to in the compile time list
+cfa		runtime		any		gets execution address from a word pointer
+0buffer		runtime		any		(size buffer --) replaces spaces with NUL
+word		runtime		any		returns pointer to next word in current line
+number		runtime		any		(str* -- t|f)
+number		runtime		any		(str* -- number)
+eval		runtime		any		(size buffer -- output) evaluates a buffer
+strhere		runtime		any		moves string to heap
+create		runtime		any		creates a new entry with the next word in the current buffer
+:		runtime		any		starts a new word
+;		compile		any		ends word definition
+last		runtime		any		returns pointer to last definition
+c-last		runtime		any		returns pointer to last compile time definition
+last!		runtime		any		set pointer to last definition
+c-last		runtime		any		set pointer to last compile time definition
+[		runtime		any		start compiling
+]		compile		any		end compiling
+"		both		any		makes a string and pushes a pointer
+."		both		any		prints string
+(		both		any		comment
+repl		runtime		any		start REPL
+allot		runtime		any		allot space on the heap
+variable	runtime		any		create a variable
+if		compile		any		start if statement
+then		compile		any		end if statement
+p>		runtime		any		push value onto parallell stack
+>p		runtime		any		pop value from parallell stack
