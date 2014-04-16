@@ -6,7 +6,7 @@ all: $(SOURCES)
 	gcc -m32 $(SOURCES) -obuild/cforth
 
 hardcode.c:
-	ruby generate.rb native.c
+	ruby generate.rb native.c hardcode.c
 
 clean:
 	-rm *.o hardcode.c build/cforth

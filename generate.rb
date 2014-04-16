@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-if ARGV.length < 1
+if ARGV.length < 2
 	abort "not enough arguments"
 end
 
@@ -53,7 +53,7 @@ file.close
 
 puts "Found #{c_words.length + c_defs.length} compile time words and #{r_words.length + r_defs.length} runtime words."
 
-file = File.new "hardcode.c", "w"
+file = File.new ARGV[1], "w"
 file.puts output
 
 puts "Hardcoding runtime words..."

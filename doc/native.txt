@@ -66,3 +66,4 @@ if		compile		any		start if statement
 then		compile		any		end if statement
 p>		runtime		any		push value onto parallell stack
 >p		runtime		any		pop value from parallell stack
+does		compile		any		adds a compile time definition to a word

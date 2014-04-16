@@ -686,3 +686,16 @@ void s_to_p(){
 void p_to_s(){
 	push(p_pop());
 }
+
+//g c does does
+void does(){
+	dputs("Creating compile time word");
+
+	push((var) &ret);
+	comma();
+	push(C_LAST);
+	C_LAST = HERE;
+	comma();
+	push(R_LAST + 4);
+	strhere();
+}
