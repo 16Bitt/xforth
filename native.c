@@ -555,6 +555,11 @@ void c_bracket(){
 void quote(){
 	word();
 	
+	if(ibuffer[char_pos - 1] == '"'){
+		ibuffer[char_pos - 1] = 0;
+		return;
+	}
+
 	while((ibuffer[char_pos] != '"') && (char_pos < ibuffer_length)){
 		if(ibuffer[char_pos] == 0)
 			ibuffer[char_pos] = ' ';
@@ -580,6 +585,19 @@ void c_quote(){
 
 	word();
 	var start_string = pop();
+	
+	if(ibuffer[char_pos - 1] == '"'){
+		ibuffer[char_pos - 1] = 0;
+		push(start_string);
+		strhere();
+		*((var*) save) = HERE;
+
+		push((var) &lit);
+		comma();
+		push(start_string);
+		comma();
+		return;
+	}
 
 	while((ibuffer[char_pos] != '"') && (char_pos < ibuffer_length)){
 		if(ibuffer[char_pos] == 0)
