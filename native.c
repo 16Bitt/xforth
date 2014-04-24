@@ -345,6 +345,8 @@ void zero_buffer(){
 			buffer[i] = 0;
 		else if(buffer[i] == '\n')
 			buffer[i] = 0;
+		else if(buffer[i] == '\t')
+			buffer[i] = 0;
 	}
 }
 
@@ -716,4 +718,39 @@ void does(){
 	comma();
 	push(R_LAST + 4);
 	strhere();
+}
+
+//g r file-open file_open
+void file_open(){
+	char* file = (char*) pop();
+	char* mode = (char*) pop();
+	FILE* fp = fopen(file, mode);
+	
+	if(fp == 0)
+		dputs("File couldn't be opened");
+	
+	push((var) fp);
+}
+
+//g r file-write file_write
+void file_write(){
+	FILE* fp = (FILE*) pop();
+	char* str = (char*) pop();
+	fprintf(fp, str);
+}
+
+//g r file-read file_read
+void file_read(){
+	FILE* fp = (FILE*) pop();
+	char str[512];
+	if(fscanf(fp, "%s", str) == EOF)
+		push(0);
+	else
+		push((var) str);
+}
+
+//g r file-close file_close
+void file_close(){
+	FILE* fp = (FILE*) pop();
+	fclose(fp);
 }
