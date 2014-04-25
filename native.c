@@ -263,7 +263,7 @@ void list(){
 	}
 }
 
-//g r leave-clean leave_clean
+//g r exit leave_clean
 void leave_clean(){
 	dputs("Freeing current buffer");
 	free(current);
@@ -343,9 +343,9 @@ void zero_buffer(){
 	for(i = 0; i < size; i++){
 		if(buffer[i] == ' ')
 			buffer[i] = 0;
-		else if(buffer[i] == '\n')
-			buffer[i] = 0;
 		else if(buffer[i] == '\t')
+			buffer[i] = 0;
+		else if(buffer[i] == '\n')
 			buffer[i] = 0;
 	}
 }
@@ -394,7 +394,11 @@ void number(){
 
 //g r eval eval
 void eval(){
-	ibuffer = pop();
+	p_push((var) ibuffer);
+	p_push(char_pos);
+	p_push(ibuffer_length);
+
+	ibuffer = (char*)  pop();
 	ibuffer_length = pop();
 	char_pos = 0;
 
@@ -480,6 +484,10 @@ void eval(){
 
 	dputs("Freeing input buffer");
 	free(ibuffer);
+
+	ibuffer_length 	= p_pop();
+	char_pos 	= p_pop();
+	ibuffer		= (char*) p_pop();
 }
 
 //g r strhere strhere
@@ -690,6 +698,21 @@ void f_if(){
 	comma();
 }
 
+//g c else f_else
+void f_else(){
+	push((var) &jump);		//&jmp --
+	comma();			//--
+	var save = HERE;		//--
+	push(0);			//0 --
+	comma();			//--
+	
+	push(HERE - 4);			//HERE --
+	push(p_pop());			//HERE -- ADDR --
+	set();				//--
+
+	p_push(save);			//--
+}
+
 //g c then f_then
 void f_then(){
 	push(HERE);
@@ -753,4 +776,38 @@ void file_read(){
 void file_close(){
 	FILE* fp = (FILE*) pop();
 	fclose(fp);
+}
+
+//g r load file_load
+void file_load(){
+	char* filename = (char*) pop();
+	FILE* fp = fopen(filename, "rt");
+	
+	if(fp == NULL){
+		dputs("Failed to load file");
+		return;
+	}
+
+	size_t size = 512;
+	char* input = (char*) malloc(size);
+
+	while(getline(&input, &size, fp) != EOF){
+		if(strlen(input) == 0)
+			continue;
+		
+		push(512);
+		push((var) input);
+		zero_buffer();
+		push(512);
+		push((var) input);
+		eval();
+	}
+
+	fclose(fp);
+}
+
+//g r free f_free
+void f_free(){
+	void* ptr = (void*) pop();
+	free(ptr);
 }
