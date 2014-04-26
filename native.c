@@ -394,9 +394,9 @@ void number(){
 
 //g r eval eval
 void eval(){
-	p_push((var) ibuffer);
+	/*p_push((var) ibuffer);
 	p_push(char_pos);
-	p_push(ibuffer_length);
+	p_push(ibuffer_length);*/
 
 	ibuffer = (char*)  pop();
 	ibuffer_length = pop();
@@ -406,7 +406,10 @@ void eval(){
 		if(!state){
 			word();						//word* --
 			dup();						//word* -- word* --
-	
+			
+			dup();
+			char* save_word = (char*) pop();
+
 			if(!pop()){					//word* --
 				drop();					//--
 				return;
@@ -420,8 +423,8 @@ void eval(){
 				dup();					//addr -- addr --
 			
 				if(!pop()){				//addr --
-					puts("WORD NOT FOUND");
-					drop();				//--
+					puts("WORD NOT FOUND:");
+					puts(save_word);				//--
 					return;
 				}
 	
@@ -437,6 +440,9 @@ void eval(){
 		else{
 			word();			//word* --
 			dup();			//word* -- word* --
+			
+			dup();
+			char* save_word = (char*) pop();
 
 			if(!pop()){		//word* --
 				drop();			//--
@@ -477,7 +483,8 @@ void eval(){
 			}
 
 			drop();			//--
-			puts("S=1 WORD NOT FOUND");
+			puts("S=1 WORD NOT FOUND:");
+			puts(save_word);
 			return;
 		}
 	}
@@ -485,9 +492,9 @@ void eval(){
 	dputs("Freeing input buffer");
 	free(ibuffer);
 
-	ibuffer_length 	= p_pop();
+	/*ibuffer_length 	= p_pop();
 	char_pos 	= p_pop();
-	ibuffer		= (char*) p_pop();
+	ibuffer		= (char*) p_pop();*/
 }
 
 //g r strhere strhere
@@ -789,18 +796,29 @@ void file_load(){
 	}
 
 	size_t size = 512;
-	char* input = (char*) malloc(size);
+	char* input = malloc(size);
 
 	while(getline(&input, &size, fp) != EOF){
-		if(strlen(input) == 0)
+		if(strlen(input) <= 0)
 			continue;
 		
-		push(512);
+		push(size);
 		push((var) input);
 		zero_buffer();
-		push(512);
+		push(size);
 		push((var) input);
+
+		p_push((var) ibuffer);
+		p_push(char_pos);
+		p_push(ibuffer_length);
+		
 		eval();
+
+		ibuffer_length 	= p_pop();
+		char_pos	= p_pop();
+		ibuffer		= (var) p_pop();
+		
+		memset((void*) input, 0, size);
 	}
 
 	fclose(fp);
