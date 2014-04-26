@@ -239,9 +239,10 @@ void f_xor(){
 
 //g r line get_forth_line
 void get_forth_line(){
-	char* input_buffer = (char*) malloc(128);
-	memset((void*) input_buffer, 0, 128);
-	gets(input_buffer);
+	size_t size = 512;
+	char* input_buffer = (char*) malloc(size);
+	memset((void*) input_buffer, 0, size);
+	getline(&input_buffer, &size, stdin);
 	push((var) input_buffer);
 }
 
@@ -820,7 +821,8 @@ void file_load(){
 		
 		memset((void*) input, 0, size);
 	}
-
+	
+	free(input);
 	fclose(fp);
 }
 

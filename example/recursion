@@ -1,5 +1,8 @@
 ( This is a basic example of recursion in xforth.)
 ( While recursion isn't recommended in forth, it is still an option)
+
 ." Adding factorial word..." 10 emit
-: factorial dup 1 > if dup 1 - factorial * else drop 1 then ;
+: factorial ( n -- n!)
+	dup 1 > if dup 1 - factorial * else drop 1 then ;
+
 ." 5! is" 32 emit 5 factorial .
