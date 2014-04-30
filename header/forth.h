@@ -33,6 +33,7 @@ extern int flag_echo;
 extern unsigned int init_stack_size;
 extern unsigned int init_heap_size;
 extern char* entry_point;
+extern char* file_init_name;
 
 void set_arguments(char** argv, int argc);
 

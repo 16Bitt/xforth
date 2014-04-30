@@ -7,9 +7,10 @@ int flag_echo;
 unsigned int init_stack_size;
 unsigned int init_heap_size;
 char* entry_point;
+char* file_init_name;
 
 void check_arguments(int num){
-	if(num != 6){
+	if(num != 7){
 		puts("Not enough arguments to initialize a forth environment");
 		exit(-1);
 	}
@@ -25,4 +26,5 @@ void set_arguments(char** argv, int argc){
 	init_heap_size = atoi(argv[4]);
 
 	entry_point = argv[5];
+	file_init_name = argv[6];
 }

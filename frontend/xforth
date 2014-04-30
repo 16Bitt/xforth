@@ -62,13 +62,14 @@ class ArgParse
 	end
 end
 
-args = ArgParse.new ["--stack-size", "--heap-size", "--custom-backend", "--debug", "--echo"]
+args = ArgParse.new ["--stack-size", "--heap-size", "--custom-backend", "--debug", "--echo", "--file"]
 
 stackSize 	= args.getValue("--stack-size")
 heapSize 	= args.getValue("--heap-size")
 backend 	= args.getValue("--custom-backend")
 dbg 		= args.getValue("--debug")
 echoFlag 	= args.getValue("--echo")
+init_file	= args.getValue("--file")
 
 if not stackSize
 	stackSize = "512"
@@ -92,4 +93,8 @@ if not echoFlag
 	echoFlag = "on"
 end
 
-exec "cforth #{dbg} #{echoFlag} #{stackSize} #{heapSize} #{args.target}"
+if not init_file
+	init_file = "none"
+end
+
+exec "cforth #{dbg} #{echoFlag} #{stackSize} #{heapSize} #{args.target} #{init_file}"

@@ -12,7 +12,7 @@ clean:
 	-rm *.o hardcode.c build/cforth
 
 run: all
-	./build/cforth off on 512 4096 repl
+	./build/cforth off on 512 4096 repl none
 
 install: all
 	cp build/cforth /bin/

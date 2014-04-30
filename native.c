@@ -831,3 +831,11 @@ void f_free(){
 	void* ptr = (void*) pop();
 	free(ptr);
 }
+
+//g r init bs_file
+void bs_file(){
+	push((var) file_init_name);
+	file_load();
+	puts("");
+	repl();
+}
