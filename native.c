@@ -1,6 +1,7 @@
 #include "forth.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "string.h"
 
 #define var unsigned int
 
@@ -767,7 +768,7 @@ void file_open(){
 void file_write(){
 	FILE* fp = (FILE*) pop();
 	char* str = (char*) pop();
-	fprintf(fp, str);
+	fprintf(fp, "%s\n", str);
 }
 
 //g r file-read file_read
@@ -838,4 +839,63 @@ void bs_file(){
 	file_load();
 	puts("");
 	repl();
+}
+
+//g c begin f_begin
+void f_begin(){
+	p_push(HERE - 4);
+}
+
+//g c until f_until
+void f_until(){
+	push((var) &zjump);
+	comma();
+	push(p_pop());
+	comma();
+}
+
+//g c again f_again
+void f_again(){
+	push((var) &jump);
+	comma();
+	push(p_pop() + 4);
+	comma();
+}
+
+void do_internal(){
+	swap();
+	p_push(pop());
+	p_push(pop());
+}
+
+//g c do f_do
+void f_do(){
+	push((var) &do_internal);
+	comma();
+	p_push(HERE - 4);
+}
+
+void loop_internal(){
+	var upper = p_pop();
+	var lower = p_pop();
+
+	if(lower < upper){
+		lower++;
+		p_push(lower);
+		p_push(upper);
+		push(0);
+	}
+	
+	else
+		push(1);
+}
+
+//g c loop f_loop
+void f_loop(){
+	push((var) &loop_internal);
+	comma();
+	push((var) &zjump);
+	comma();
+	push(p_pop());
+	comma();
 }
