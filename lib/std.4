@@ -1,5 +1,16 @@
 ( This is simply to extend the basic functionality of the core language)
 
-: readable " r" ;
-: writeable " w" ;
-: read-writeable " rw" ;
+( File convenience routines)
+: readable 		" r" ;
+: writeable 		" wb+" ;
+: read-writeable 	" rwb+" ;
+
+( Variable arithmetic routines)
+: +!	( num var --) 	dup p> @ + >p ! ;
+: -!	( num var --) 	dup p> @ swap - >p ! ;
+: 1+!	( var --) 1 	swap +! ;
+: 1-!	( var --) 1 	swap -! ;
+
+( These are for allocation purposes)
+: cell 	4 ;
+: cells 4 * ;
