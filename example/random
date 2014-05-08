@@ -1,0 +1,6 @@
+( Generates a random word)
+
+: letter 27 ;
+
+: generate 	( limit -- random) 	random swap % 65 + ;
+: random-word 				0 8 do letter generate emit loop ;

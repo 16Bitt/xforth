@@ -14,3 +14,13 @@
 ( These are for allocation purposes)
 : cell 	4 ;
 : cells 4 * ;
+: char	1 ;
+: letter 27 ;
+: alpha	65 ;
+
+( Printing routines)
+: cr 10 emit ;
+: spc 32 emit ;
+
+( Random routine)
+: generate	( limit -- rand%limit)	random swap % ;

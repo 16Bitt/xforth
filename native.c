@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include "time.h"
 
 #define var unsigned int
 
@@ -179,6 +180,13 @@ void divide(){
 	ASSERT(a != 0)
 
 	push(b / a);
+}
+
+//g r % modulo
+void modulo(){
+	var a = pop();
+	var b = pop();
+	push(b % a);
 }
 
 //g r , comma
@@ -664,6 +672,8 @@ void c_paren(){
 
 //g r repl repl
 void repl(){
+	srand(time(NULL));
+
 	status();
 	ok();
 	
@@ -879,7 +889,7 @@ void loop_internal(){
 	var upper = p_pop();
 	var lower = p_pop();
 
-	if(lower < upper){
+	if(lower + 1 < upper){
 		lower++;
 		p_push(lower);
 		p_push(upper);
@@ -898,4 +908,26 @@ void f_loop(){
 	comma();
 	push(p_pop());
 	comma();
+}
+
+/*
+// g r forget forget
+void forget(){
+	word();
+	dup();
+	find();
+	var runtime = pop();
+	cfind();
+	var compile = pop();
+
+	var current_word = R_LAST;
+	if(runtime){
+		
+	}
+}
+*/
+
+//g r random f_random
+void f_random(){
+	push(rand());
 }
