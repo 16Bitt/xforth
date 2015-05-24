@@ -251,7 +251,9 @@ void get_forth_line(){
 	size_t size = 512;
 	char* input_buffer = (char*) malloc(size);
 	memset((void*) input_buffer, 0, size);
-	getline(&input_buffer, &size, stdin);
+	int status = getline(&input_buffer, &size, stdin);
+	if(status == EOF)
+		exit(0);
 	push((var) input_buffer);
 }
 
@@ -732,11 +734,17 @@ void f_else(){
 	p_push(save);			//--
 }
 
+//g r nop nop
+void nop(){
+}
+
 //g c then f_then
 void f_then(){
 	push(HERE);
 	push(p_pop());
 	set();
+	push((var) &nop);
+	comma();
 }
 
 //g r p> s_to_p
